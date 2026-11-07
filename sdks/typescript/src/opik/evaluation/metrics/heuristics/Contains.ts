@@ -36,6 +36,12 @@ export class Contains extends BaseMetric {
   async score(input: Input): Promise<EvaluationScoreResult> {
     const { output, substring } = input;
 
+    if (typeof substring !== "string" || substring.length === 0) {
+      throw new Error(
+        "Invalid reference string provided. Reference must be a non-empty string.",
+      );
+    }
+
     const handledOutput = this.caseSensitive ? output : output.toLowerCase();
     const handledExpected = this.caseSensitive
       ? substring

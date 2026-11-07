@@ -22,12 +22,24 @@ describe("Contains Metric", () => {
       expect(result.reason).toContain("not found in output");
     });
 
-    it("should handle empty strings correctly", async () => {
+    it("should return 0.0 for an empty output and a non-empty substring", async () => {
       const result = await contains.score({ output: "", substring: "test" });
       expect(result.value).toBe(0.0);
+    });
 
-      const result2 = await contains.score({ output: "test", substring: "" });
-      expect(result2.value).toBe(1.0);
+    it("should reject empty substrings", async () => {
+      await expect(
+        contains.score({ output: "test", substring: "" }),
+      ).rejects.toThrow("Reference must be a non-empty string");
+    });
+
+    it("should reject null substrings with a clear error", async () => {
+      await expect(
+        contains.score({
+          output: "test",
+          substring: null as unknown as string,
+        }),
+      ).rejects.toThrow("Reference must be a non-empty string");
     });
   });
 
@@ -50,6 +62,19 @@ describe("Contains Metric", () => {
         substring: "Hello",
       });
       expect(result2.value).toBe(1.0);
+    });
+
+    it("should reject empty and null substrings when case-sensitive", async () => {
+      await expect(
+        caseSensitiveContains.score({ output: "test", substring: "" }),
+      ).rejects.toThrow("Reference must be a non-empty string");
+
+      await expect(
+        caseSensitiveContains.score({
+          output: "test",
+          substring: null as unknown as string,
+        }),
+      ).rejects.toThrow("Reference must be a non-empty string");
     });
   });
 
